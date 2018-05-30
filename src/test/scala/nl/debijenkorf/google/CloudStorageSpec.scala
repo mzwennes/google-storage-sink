@@ -1,8 +1,8 @@
-package nl.debijenkorf.snowplow
+package nl.debijenkorf.google
 
 import java.io.FileWriter
 
-import nl.debijenkorf.snowplow.storage.{CloudStorage, GoogleStorage}
+import nl.debijenkorf.google.storage.{CloudStorage, GoogleStorage}
 import org.scalatest.{BeforeAndAfter, FlatSpec}
 
 class CloudStorageSpec extends FlatSpec with BeforeAndAfter {

@@ -1,4 +1,4 @@
-package nl.debijenkorf.snowplow
+package nl.debijenkorf.google
 
 import java.io.FileWriter
 import java.text.SimpleDateFormat

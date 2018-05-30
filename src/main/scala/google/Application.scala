@@ -1,7 +1,7 @@
-package nl.debijenkorf.snowplow
+package nl.debijenkorf.google
 
 import com.spotify.google.cloud.pubsub.client.Pubsub
-import nl.debijenkorf.snowplow.consumer.ConsumerBuilder
+import nl.debijenkorf.google.consumer.ConsumerBuilder
 
 object Application {
 

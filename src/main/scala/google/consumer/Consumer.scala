@@ -1,4 +1,4 @@
-package nl.debijenkorf.snowplow.consumer
+package nl.debijenkorf.google.consumer
 
 import java.io.Closeable
 

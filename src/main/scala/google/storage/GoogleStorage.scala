@@ -1,4 +1,4 @@
-package nl.debijenkorf.snowplow.storage
+package nl.debijenkorf.google.storage
 import java.io.{File, FileInputStream}
 import java.nio.file.{Files, Path, Paths}
 

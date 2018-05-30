@@ -1,4 +1,4 @@
-package nl.debijenkorf.snowplow.storage
+package nl.debijenkorf.google.storage
 
 final case class BucketNotFoundException(
   private val message: String = "",

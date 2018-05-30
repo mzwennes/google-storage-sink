@@ -1,7 +1,7 @@
-package nl.debijenkorf.snowplow
+package nl.debijenkorf.google
 
 import com.typesafe.config.ConfigFactory
-import nl.debijenkorf.snowplow.storage.{CloudStorage, GoogleStorage}
+import nl.debijenkorf.google.storage.{CloudStorage, GoogleStorage}
 
 case class CustomConfiguration(
   projectId: String,

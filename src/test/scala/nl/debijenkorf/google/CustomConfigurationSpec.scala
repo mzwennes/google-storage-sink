@@ -1,4 +1,4 @@
-package nl.debijenkorf.snowplow
+package nl.debijenkorf.google
 
 class CustomConfigurationSpec {
 

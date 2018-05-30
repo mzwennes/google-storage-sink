@@ -1,10 +1,10 @@
-package nl.debijenkorf.snowplow.consumer
+package nl.debijenkorf.google.consumer
 
 import java.io.Closeable
 
 import com.spotify.google.cloud.pubsub.client.{Pubsub, Puller}
 import com.spotify.google.cloud.pubsub.client.Puller.MessageHandler
-import nl.debijenkorf.snowplow.CustomConfiguration
+import nl.debijenkorf.google.CustomConfiguration
 
 private class PubSubConsumer(config: CustomConfiguration, client: Pubsub, handler: MessageHandler) extends Consumer {
   override def pull(): Closeable = Puller.builder()
