@@ -2,7 +2,8 @@ package nl.debijenkorf.google
 
 import java.io.FileWriter
 
-import nl.debijenkorf.google.storage.{CloudStorage, GoogleStorage}
+import google.storage.CloudStorage
+import nl.debijenkorf.google.storage.GoogleStorage
 import org.scalatest.{BeforeAndAfter, FlatSpec}
 
 class CloudStorageSpec extends FlatSpec with BeforeAndAfter {

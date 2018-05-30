@@ -1,6 +1,6 @@
 package nl.debijenkorf.google.storage
 import java.io.{File, FileInputStream}
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.{Files, Paths}
 
 import com.google.cloud.storage.{Blob, BlobId, BlobInfo, Bucket, BucketInfo, Storage, StorageException, StorageOptions}
 import org.slf4j.LoggerFactory
