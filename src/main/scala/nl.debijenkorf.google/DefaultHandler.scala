@@ -7,8 +7,9 @@ import java.util.concurrent.CompletableFuture
 
 import com.spotify.google.cloud.pubsub.client.Puller.MessageHandler
 import com.spotify.google.cloud.pubsub.client.{Message, Puller}
+import nl.debijenkorf.google.storage.CloudStorage
 
-case class DefaultHandler(config: CustomConfiguration) {
+case class DefaultHandler(storage: CloudStorage, maxRecords: Int = 10000, bucketName: String) {
 
   private var records = 0
 
@@ -17,7 +18,7 @@ case class DefaultHandler(config: CustomConfiguration) {
     * is executed for each record that is sent to the pipe.
     */
   def default: MessageHandler = (puller: Puller, subscription: String, message: Message, ackId: String) => {
-    val data = new String (
+    val data = new String(
       java.util.Base64.getDecoder.decode(message.data())
     )
     firehose(data)
@@ -36,8 +37,8 @@ case class DefaultHandler(config: CustomConfiguration) {
       records += 1
     }
     finally fw.close()
-    if (records >= config.maxRecordsInFile) {
-      config.storageOption.put(config.bucketName, filePath, deleteLocal = true)
+    if (records >= maxRecords) {
+      storage.put(bucketName, filePath, deleteLocal = true)
     }
   }
 

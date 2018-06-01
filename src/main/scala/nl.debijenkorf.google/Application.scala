@@ -1,17 +1,21 @@
 package nl.debijenkorf.google
 
-import com.spotify.google.cloud.pubsub.client.Pubsub
 import nl.debijenkorf.google.consumer.ConsumerBuilder
 
 object Application {
 
   def main(args: Array[String]): Unit = {
-    val client: Pubsub = Pubsub.builder().build()
-    val config = CustomConfiguration()
-    val handler = DefaultHandler(config)
+    val config = CustomConfig()
+
+    val handler = DefaultHandler(
+      storage = config.storageOption,
+      maxRecords = config.maxRecordsInFile,
+      bucketName = config.bucketName
+    )
 
     val consumer = new ConsumerBuilder(config)
-      .pubsub(client, handler.default)
+      .pubsub(handler.default)
+
     consumer.pull()
   }
 

@@ -3,7 +3,7 @@ package nl.debijenkorf.google
 import com.typesafe.config.ConfigFactory
 import nl.debijenkorf.google.storage.{CloudStorage, GoogleStorage}
 
-case class CustomConfiguration(
+case class CustomConfig(
   projectId: String,
   subscriptionName: String,
   threadConcurrency: Int,
@@ -12,16 +12,21 @@ case class CustomConfiguration(
   maxRecordsInFile: Int,
 )
 
-object CustomConfiguration {
-  def apply(): CustomConfiguration = {
+object CustomConfig {
+  def apply(): CustomConfig = {
     val raw = ConfigFactory.load()
-    CustomConfiguration(
+    CustomConfig(
       projectId = raw.getString("google.project.id"),
       subscriptionName = raw.getString("google.subscription.name"),
       threadConcurrency = raw.getInt("google.subscription.threads"),
-      storageOption = new GoogleStorage, //todo: switch based on value in conf
       bucketName = raw.getString("google.storage.bucket"),
-      maxRecordsInFile = raw.getInt("google.storage.max-records")
+      maxRecordsInFile = raw.getInt("google.storage.max-records"),
+      storageOption = storage(raw.getString("application.storage.type"))
     )
+  }
+
+  private def storage(name: String): CloudStorage = name match {
+    case "google" => new GoogleStorage
+    case _ => throw new NotImplementedError("Only Google Storage is implemented for now.")
   }
 }
