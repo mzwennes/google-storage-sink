@@ -8,8 +8,9 @@ import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.pubsub.v1.{MessageReceiver, Subscriber}
 import com.google.pubsub.v1.ProjectSubscriptionName
 import com.typesafe.scalalogging.LazyLogging
+import nl.debijenkorf.snowplow.config.Configuration
 
-case class GooglePubSubConsumer(gc: GoogleConfig, receiver: MessageReceiver)
+case class GooglePubSubConsumer(cfg: Configuration, receiver: MessageReceiver)
   extends MessageConsumer with LazyLogging {
 
   private var subscriber: Subscriber = _
@@ -26,10 +27,10 @@ case class GooglePubSubConsumer(gc: GoogleConfig, receiver: MessageReceiver)
 
   override def start(): Unit = try {
     logger.info("creating subscription or retrieving existing one..")
-    val subscription = getOrCreateSubscription(gc.projectId, gc.topicId, gc.subscriptionId)
+    val subscription = getOrCreateSubscription(cfg.projectId, cfg.topicId, cfg.subscriptionId)
 
     logger.info("checking Google credentials and handling authentication..")
-    val credentials = GoogleCredentials.fromStream(new FileInputStream(gc.secretKeyPath))
+    val credentials = GoogleCredentials.fromStream(new FileInputStream(cfg.auth))
 
     logger.info("adding subscribers to the topic..")
     subscriber = Subscriber.newBuilder(subscription, receiver)

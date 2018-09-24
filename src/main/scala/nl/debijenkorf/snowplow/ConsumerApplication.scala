@@ -1,6 +1,7 @@
 package nl.debijenkorf.snowplow
 
-import nl.debijenkorf.snowplow.consumers.{GoogleConfig, GooglePubSubConsumer, MessageConsumer}
+import nl.debijenkorf.snowplow.config.ConfigurationParser
+import nl.debijenkorf.snowplow.consumers.{GooglePubSubConsumer, MessageConsumer}
 import nl.debijenkorf.snowplow.receivers.SendToGoogleStorage
 import nl.debijenkorf.snowplow.serializers.GzipFileSerializer
 import nl.debijenkorf.snowplow.storage.GoogleStorage
@@ -9,30 +10,22 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object ConsumerApplication {
   def main(args: Array[String]): Unit = {
-    val config = parseArguments(args)
+    val parser = new ConfigurationParser()
 
-    val googleConfig = GoogleConfig(
-      projectId = config.projectId,
-      topicId = config.topicId,
-      subscriptionId = config.subscriptionId,
-      secretKeyPath = config.secretKeyPath
-    )
+    parser.parse(args) match {
+      case Some(cfg) =>
+        val storageReceiver = SendToGoogleStorage(
+          storage = GoogleStorage(cfg.auth, cfg.bucketName),
+          serializer = GzipFileSerializer(),
+          maxRows = cfg.maxRecords
+        )
+        val consumer: MessageConsumer = GooglePubSubConsumer(
+          cfg = cfg,
+          receiver = storageReceiver
+        )
+        consumer.start()
+      case None => throw new Exception("invalid parameter(s) supplied.")
+    }
 
-    val consumer: MessageConsumer = GooglePubSubConsumer(
-      gc = googleConfig,
-      receiver = SendToGoogleStorage(
-        storage = GoogleStorage(config.secretKeyPath, config.bucketName),
-        serializer = GzipFileSerializer(),
-        maxRows = config.maxRecordsInFile
-      )
-    )
-
-    consumer.start()
-  }
-
-  def parseArguments(args: Array[String]): CustomConfig = {
-    val arguments = args.toList
-    if (arguments.isEmpty) CustomConfig()
-    else CustomConfig(arguments.head)
   }
 }
