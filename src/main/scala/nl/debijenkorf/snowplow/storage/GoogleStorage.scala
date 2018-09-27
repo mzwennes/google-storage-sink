@@ -18,8 +18,8 @@ case class GoogleStorage(secretKeyPath: String, bucketName: String)
     .build()
     .getService
 
-  override def put(file: File): UploadStatus = {
-    createBlob(bucketName, file) match {
+  override def put(key: String, content: String): UploadStatus = {
+    createBlob(bucketName, key, content) match {
       case Right(_) => UploadSuccess
       case Left(a) => UploadFailed(a.getMessage)
     }
@@ -27,15 +27,19 @@ case class GoogleStorage(secretKeyPath: String, bucketName: String)
 
   override def get(key: String): Option[File] = {
     val blobId = BlobId.of(bucketName, key)
-    val a: Blob = client.get(blobId)
-    a.downloadTo(Paths.get(key))
+    val blob = client.get(blobId)
+
+    if (blob == null) return None
+    else blob.downloadTo(Paths.get(key))
+
     Some(new File(key))
   }
 
-  private def createBlob(bucket: String, file: File): Either[BucketNotFoundException, Blob] = {
-    val blobId = BlobId.of(bucket, file.getPath)
+  private def createBlob(bucket: String, key: String, content: String): Either[BucketNotFoundException, Blob] = {
+    val blobId = BlobId.of(bucket, key)
     val blobInfo = BlobInfo.newBuilder(blobId).setContentType("text/plain").build
-    if (bucketExists(bucket)) Right(client.create(blobInfo, new FileInputStream(file)))
+
+    if (bucketExists(bucket)) Right(client.create(blobInfo, content.getBytes("UTF-8")))
     else Left(BucketNotFoundException(s"$bucket does not exist"))
   }
 
