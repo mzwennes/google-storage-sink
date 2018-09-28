@@ -8,18 +8,19 @@ import com.google.cloud.storage.{Blob, BlobId, BlobInfo, Storage, StorageOptions
 import nl.debijenkorf.snowplow.storage.Status.{UploadFailed, UploadStatus, UploadSuccess}
 
 
-case class GoogleStorage(secretKeyPath: String, bucketName: String)
+case class GoogleStorage(bucketName: String, secretKeyLocation: String)
   extends StorageProvider {
 
-  private val credentials = GoogleCredentials.fromStream(new FileInputStream(secretKeyPath))
+  private val credentials = GoogleCredentials
+    .fromStream(new FileInputStream(secretKeyLocation))
 
   private val client = StorageOptions.newBuilder()
     .setCredentials(credentials)
     .build()
     .getService
 
-  override def put(file: File): UploadStatus = {
-    createBlob(bucketName, file) match {
+  override def put(key: String, data: Array[Byte]): UploadStatus = {
+    blob(bucketName, key, data) match {
       case Right(_) => UploadSuccess
       case Left(a) => UploadFailed(a.getMessage)
     }
@@ -27,15 +28,19 @@ case class GoogleStorage(secretKeyPath: String, bucketName: String)
 
   override def get(key: String): Option[File] = {
     val blobId = BlobId.of(bucketName, key)
-    val a: Blob = client.get(blobId)
-    a.downloadTo(Paths.get(key))
+    val blob = client.get(blobId)
+
+    if (blob == null) return None
+    else blob.downloadTo(Paths.get(key))
+
     Some(new File(key))
   }
 
-  private def createBlob(bucket: String, file: File): Either[BucketNotFoundException, Blob] = {
-    val blobId = BlobId.of(bucket, file.getPath)
+  private def blob(bucket: String, key: String, data: Array[Byte]): Either[BucketNotFoundException, Blob] = {
+    val blobId = BlobId.of(bucket, key)
     val blobInfo = BlobInfo.newBuilder(blobId).setContentType("text/plain").build
-    if (bucketExists(bucket)) Right(client.create(blobInfo, new FileInputStream(file)))
+
+    if (bucketExists(bucket)) Right(client.create(blobInfo, data))
     else Left(BucketNotFoundException(s"$bucket does not exist"))
   }
 
