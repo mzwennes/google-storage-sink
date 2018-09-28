@@ -5,12 +5,12 @@ Loads data from Google Pub/Sub to Google Storage.
 google-storage-sink v0.1
 Usage: gss [options]
 
-  -p, --project <value>  Google Project ID
-  -t, --topic <value>    Google Pub/Sub topic name
   -s, --sub <value>      Google Pub/Sub subscription name
   -b, --bucket <value>   Google Storage bucket name
-  -m, --max <value>      Max records per generated file
-  -a, --auth <value>     Location of the generated Google secret key
+  -r, --rows <value>     Max records per generated file
+  -m, --minutes <value>  Max minutes before sink empties
+  -f, --secret <value>   Location of Google Service account key
+  --help                 Prints this usage text
 ```
 
 ### Set up
@@ -29,12 +29,11 @@ But for now the resources mentioned have to be created manually.
 
     ```
     java -jar target/scala-2.12/gss-0-1.jar \
-        --project <GOOGLE_PROJECT_ID> \
-        --topic <GOOGLE_TOPIC_ID> \
         --sub <GOOGLE_SUBSCRIPTION_ID> \
         --bucket <GOOGLE_STORAGE_BUCKET_NAME> \
-        --max <MAX_RECORDS_PER_FILE> \
-        --auth <LOCATION_TO_SECRET_AUTH_FILE>
+        --rows <MAX_RECORDS_BEFORE_BUFFER_EMPTIES> \
+        --mins <MAX_MINUTES_BEFORE_BUFFER_EMPTIES> \
+        --secret <LOCATION_TO_SECRET_AUTH_FILE>
     ```
    The `auth` should reference to a JSON file with read/write access to Pub/Sub and read/write to the given 
    `storage.bucket`. It's recommended to use a `Service account` for this. [Read more about creating 
@@ -53,17 +52,16 @@ Use the following steps to build and run a Docker image locally.
     future releases.
     
     ```
-    docker build -t google-storage-sink:0.1 .
+    docker build -t google-storage-sink:0.2 .
     ```
 2. Run the application with the required parameters (supplied as `ENV VARIABLES`):
     
     ```
     docker run \
-        -e GOOGLE_PROJECT_ID=<GOOGLE_PROJECT_ID> \
-        -e GOOGLE_TOPIC_ID=<GOOGLE_TOPIC_NAME> \
-        -e GOOGLE_BUCKET_NAME=debijenkorf-snowplow-dev \
-        -e MAX_RECORDS_IN_FILE=<MAX_RECORDS_PER_FILE> \
+        -e GOOGLE_SUBSCRIPTION_ID=subscription-name \
+        -e GOOGLE_BUCKET_NAME=data-storage-bucket \
+        -e EMPTY_BUFFER_ROWS=1000 \
+        -e EMPTY_BUFFER_MINUTES=10 \
         -e SECRET_AUTH_LOCATION=/etc/secret.json \
-        -e GOOGLE_SUBSCRIPTION_ID=<GOOGLE_SUBSCRIPTION_NAME> \
-        google-storage-sink:0.1
+        google-storage-sink:0.2
     ```

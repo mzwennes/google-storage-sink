@@ -1,17 +1,11 @@
 package nl.debijenkorf.snowplow.config
 
-class ConfigurationParser {
+import java.nio.file.{Files, Paths}
+
+object ConfigurationParser {
 
   private val parser = new scopt.OptionParser[Configuration]("gss") {
-    head("google-storage-sink", "v0.1")
-
-    opt[String]('p', "project").action((x, c) => c
-      .copy(projectId = x)).text("Google Project ID")
-      .required().withFallback(() => sys.env("GOOGLE_PROJECT_ID"))
-
-    opt[String]('t', "topic").action((x, c) => c
-      .copy(topicId = x)).text("Google Pub/Sub topic name")
-      .required().withFallback(() => sys.env("GOOGLE_TOPIC_ID"))
+    head("google-storage-sink", s"v0.2")
 
     opt[String]('s', "sub").action((x, c) => c
       .copy(subscriptionId = x)).text("Google Pub/Sub subscription name")
@@ -21,15 +15,22 @@ class ConfigurationParser {
       .copy(bucketName = x)).text("Google Storage bucket name")
       .required().withFallback(() => sys.env("GOOGLE_BUCKET_NAME"))
 
-    opt[Int]('m', "max").action((x, c) => c
+    opt[Int]('r', "rows").action((x, c) => c
       .copy(maxRecords = x)).text("Max records per generated file")
-      .required().withFallback(() => sys.env("MAX_RECORDS_IN_FILE") toInt)
+      .required().withFallback(() => sys.env("EMPTY_BUFFER_ROWS") toInt)
 
-    opt[String]('a', "auth").action((x, c) => c
-      .copy(auth = x)).text("Location of the generated Google secret key")
-      .required().withFallback(() => sys.env("SECRET_AUTH_LOCATION"))
+    opt[Int]('m', "minutes").action((x, c) => c
+      .copy(maxMinutes = x)).text("Max minutes before sink empties")
+      .required().withFallback(() => sys.env("EMPTY_BUFFER_MINUTES") toInt)
 
-    help("help").text("prints this usage text")
+    opt[String]('f', "secret").action((x, c) => c
+      .copy(secretLocation = x)).text("Location of Google Service account key")
+      .validate(x =>
+        if (Files.exists(Paths.get(x))) success
+        else failure(s"given file location does not exist: $x"))
+      .required().withFallback(() => sys.env("SECRET_KEY_LOCATION"))
+
+    help("help").text("Prints this usage text")
   }
 
   def parse(args: Array[String]): Option[Configuration] =

@@ -1,25 +1,25 @@
 package nl.debijenkorf.snowplow.serializers
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
-import java.util.Base64
 import java.util.zip.{GZIPInputStream, GZIPOutputStream}
 
-import scala.io.Source
 import scala.util.Try
 
 object GzipSerializer {
-  def deflate(rows: List[String]): Try[String] = Try {
-    val output = new ByteArrayOutputStream()
-    val gzip = new GZIPOutputStream(output)
+
+  def compress(rows: Seq[String]): Array[Byte] = {
+    val bos = new ByteArrayOutputStream()
+    val gzip = new GZIPOutputStream(bos)
     rows.foreach(record => gzip.write(record.getBytes))
     gzip.close()
-    Base64.getEncoder.encodeToString(output.toByteArray)
+    val compressed = bos.toByteArray
+    bos.close()
+    compressed
   }
 
-  def inflate(deflatedTxt: String): Try[String] = Try {
-    val bytes = Base64.getDecoder.decode(deflatedTxt)
-    val gzip = new GZIPInputStream(new ByteArrayInputStream(bytes))
-    Source.fromInputStream(gzip).mkString
-  }
+  def decompress(compressed: Array[Byte]): Option[String] = Try {
+    val inputStream = new GZIPInputStream(new ByteArrayInputStream(compressed))
+    scala.io.Source.fromInputStream(inputStream).mkString
+  }.toOption
 }
 
