@@ -5,7 +5,7 @@ import java.nio.file.{Files, Paths}
 object ConfigurationParser {
 
   private val parser = new scopt.OptionParser[Configuration]("gss") {
-    head("google-storage-sink", s"v0.2")
+    head("google-storage-sink")
 
     opt[String]('s', "sub").action((x, c) => c
       .copy(subscriptionId = x)).text("Google Pub/Sub subscription name")
