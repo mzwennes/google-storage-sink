@@ -12,7 +12,7 @@ import nl.debijenkorf.snowplow.serializers.GzipSerializer
 import nl.debijenkorf.snowplow.storage.Status.{UploadFailed, UploadSuccess}
 import nl.debijenkorf.snowplow.storage.StorageProvider
 
-class CloudStorageSink(storage: StorageProvider)
+class CloudStorage(storage: StorageProvider)
   extends GraphStage[SinkShape[Seq[PubSubMessage]]] with LazyLogging {
 
   val in: Inlet[Seq[PubSubMessage]] = Inlet("GoogleStorageWriter")

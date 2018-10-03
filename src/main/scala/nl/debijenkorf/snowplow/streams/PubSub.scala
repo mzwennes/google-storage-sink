@@ -11,12 +11,12 @@ import akka.{Done, NotUsed}
 
 import scala.concurrent.Future
 
-case class GooglePubSubSource(projectId: String,
-                              clientEmail: String,
-                              primaryKey: PrivateKey,
-                              subscriptionName: String)
-                             (implicit val actorSystem: ActorSystem,
-                              implicit val mat: Materializer) {
+case class PubSub(projectId: String,
+                  clientEmail: String,
+                  primaryKey: PrivateKey,
+                  subscriptionName: String)
+                 (implicit val actorSystem: ActorSystem,
+                  implicit val mat: Materializer) {
 
   private val apiKey: String = "" // not used anymore
 
