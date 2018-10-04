@@ -43,7 +43,7 @@ class CloudStorage(storage: StorageProvider)
   }
 
   private def generateFileName: String = {
-    val dtf = DateTimeFormatter.ofPattern("yyyy-mm-dd-HH-mm-ss")
+    val dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
     val current = LocalDateTime.now().format(dtf)
     s"$current-snowplow-enriched.gz"
   }
