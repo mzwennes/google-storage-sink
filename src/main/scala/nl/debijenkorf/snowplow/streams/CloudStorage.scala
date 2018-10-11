@@ -24,7 +24,8 @@ class CloudStorage(storage: StorageProvider)
 
       setHandler(in, new InHandler {
         override def onPush(): Unit = {
-          val messages = grab(in)
+          val rawMessages = grab(in)
+          val messages = rawMessages
             .map(msg => new String(Base64.getDecoder.decode(msg.data)) + "\n")
           writeToStorage(messages)
           pull(in)
