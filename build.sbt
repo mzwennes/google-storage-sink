@@ -1,6 +1,6 @@
 val common = Seq(
   name := "google-storage-loader",
-  version := "0.3",
+  version := "0.7",
   organization := "debijenkorf.nl",
   scalaVersion := "2.12.6",
   assemblyJarName in assembly := s"${name.value}-${version.value}.jar"

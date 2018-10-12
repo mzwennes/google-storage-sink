@@ -53,7 +53,9 @@ object AkkaConsumer extends LazyLogging with App {
 
     val batchAckSink = Flow[ReceivedMessage].map(_.ackId)
       .groupedWithin(limit.rows, limit.minutes)
-      .map( acks => AcknowledgeRequest.of(acks.asJava) )
+      .map { acks =>
+        logger.info(s"acknowledged messages: ${acks.length}")
+        AcknowledgeRequest.of(acks.asJava) }
       .to(source.acknowledge())
 
     val storageSink = Flow[ReceivedMessage]
